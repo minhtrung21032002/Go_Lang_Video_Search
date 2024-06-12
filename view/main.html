@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        h2 {
+            color: #555;
+            margin-top: 20px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        li {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        video {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 20px;
+        }
+
+        input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Video List</h1>
+    <h2>Video Names</h2>
+    
+    <ul id="videoList">
+        <!-- Video items will be inserted here -->
+    </ul>
+    
+    <h3>Search Key</h3>
+    <input type="text" id="searchInput" placeholder="Search for videos..." oninput="debounceSearch()">
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            fetchVideos('');
+        });
+
+        let timeout = null;
+
+        function debounceSearch() {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                searchVideos();
+            }, 1000);
+        }
+
+        function searchVideos() {
+            const query = document.getElementById('searchInput').value;
+            fetchVideos(query);
+        }
+
+        function fetchVideos(query) {
+            fetch(`../main/search?q=${query}`)
+                .then(response => response.json())
+                .then(videos => {
+                    console.log(videos)
+                    const videoList = document.getElementById('videoList');
+                    videoList.innerHTML = '';
+                    videos.forEach(video => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <p>${video.VideoName}</p>
+                            <video controls>
+                                <source src="${video.VideoS3}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        `;
+                        videoList.appendChild(li);
+                    });
+                });
+        }
+    </script>
+</body>
+</html>
